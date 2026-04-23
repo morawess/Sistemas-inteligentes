@@ -27,6 +27,7 @@ public class Controlador implements ActionListener {
         this.perceptronSimpleAND = perceptronSimpleAND;
         this.view.btnEntrenamiento.addActionListener(this);
         this.view.btnAprendizaje.addActionListener(this);
+        this.view.btnAutoEntrenar.addActionListener(this);
         this.view.btnPrueba.addActionListener(this);
    
         this.chartPanel = this.grafico.getChartPanel();
@@ -95,7 +96,41 @@ public class Controlador implements ActionListener {
             }
             
         }
-        
+        if (e.getSource() == view.btnAutoEntrenar) {
+            int maxEpocas = 100; 
+            int epocaActual = 0;
+
+            while (perceptronSimpleAND.getFila() < 4 && epocaActual < maxEpocas) {
+                perceptronSimpleAND.Entrenamiento();
+
+                if (perceptronSimpleAND.getError() != 0f) {
+                    perceptronSimpleAND.Aprendizaje();
+                }
+                epocaActual++;
+            }
+
+            if (perceptronSimpleAND.getFila() == 4) {
+                view.jlbEstado.setText("AUTO-ENTRENAMIENTO COMPLETADO en " + epocaActual + " pasos");
+            } else {
+                view.jlbEstado.setText("AUTO-ENTRENAMIENTO FALLIDO");
+            }
+
+            view.jlbPeso1.setText("Peso 1: " + Float.toString(perceptronSimpleAND.getW1()));
+            view.jlbPeso2.setText("Peso 2: " + Float.toString(perceptronSimpleAND.getW2()));
+            view.jlbUmbral.setText("Umbral: " + Float.toString(perceptronSimpleAND.getW0()));
+
+            float X1 = -2;
+            float Y1 = (-perceptronSimpleAND.getW0() - perceptronSimpleAND.getW1() * X1) / perceptronSimpleAND.getW2();
+            float X2 = 2;
+            float Y2 = (-perceptronSimpleAND.getW0() - perceptronSimpleAND.getW1() * X2) / perceptronSimpleAND.getW2();
+
+            graficoConRecta = new Grafico(Y1, Y2, X1, X2, perceptronSimpleAND.getRepeticion());
+            chartPanel2 = graficoConRecta.getChartPanel();
+            chartPanel2.setPreferredSize(new Dimension(400, 400));
+            view.panelGrafico.removeAll();
+            view.panelGrafico.add(chartPanel2, BorderLayout.CENTER);
+            view.panelGrafico.validate();
+        }
         if (e.getSource() == view.btnPrueba) {
             
             String Entrada1 = view.jtfEntrada1.getText();
